@@ -42,14 +42,15 @@ def load_goemo(train_file = 'dataset/train.tsv',
     return train_df, dev_df, class_names
 
 class EmoDataset(torch.utils.data.Dataset):
-    def __init__(self, encodings, labels=None):
+    def __init__(self, encodings, labels=None, ekman=False):
         self.encodings = encodings
         self.labels = labels
+        self.num_classes = 7 if ekman else 28
 
     def __getitem__(self, idx):
         item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
         if self.labels:
-          item['labels'] = torch.nn.functional.one_hot(torch.Tensor(self.labels[idx]).long(), num_classes=28).sum(dim=0).float()
+          item['labels'] = torch.nn.functional.one_hot(torch.Tensor(self.labels[idx]).long(), num_classes=self.num_classes).sum(dim=0).float()
         return item
 
     def __len__(self):
