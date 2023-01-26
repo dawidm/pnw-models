@@ -6,6 +6,8 @@ from transformers import BertPreTrainedModel, BertModel, EvalPrediction, BertTok
 import torch
 from transformers.modeling_outputs import SequenceClassifierOutput
 
+from goemo.dataset import EmoDataset
+
 
 class BertForEmo(BertPreTrainedModel):
     def __init__(self, config):
@@ -82,6 +84,21 @@ def emo_compute_metrics(p: EvalPrediction, return_report=False, threshold=0.13):
       out['report'] = classification_report(p.label_ids, preds, digits=3)
 
     return out
+
+
+def get_trainer(checkpoint_dir, test_df):
+  bert_model = BertForEmo.from_pretrained(checkpoint_dir)#, num_labels=8, problem_type='multi_label_classification')
+  tokenizer = BertTokenizerFast.from_pretrained(checkpoint_dir)
+  dev_encodings = tokenizer(list(test_df['text']), truncation=True, padding=True, max_length=50)
+
+  test_dataset = EmoDataset(dev_encodings, list(test_df['class']), ekman=True)
+
+  return Trainer(
+      bert_model,
+      eval_dataset=test_dataset,
+      compute_metrics = emo_compute_metrics,
+      tokenizer=tokenizer,
+  ), test_dataset
 
 
 # hf trainer for inference
