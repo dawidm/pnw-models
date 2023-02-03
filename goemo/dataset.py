@@ -38,6 +38,7 @@ def load_goemo(train_file = 'dataset/train.tsv',
     dev_df = pd.read_csv(dev_file, sep='\t', header=None, names=columns)
 
     class_names = _convert_labels(train_df, ekman, emo_names_file, ekman_mappings_file)
+    class_names = _convert_labels(dev_df, ekman, emo_names_file, ekman_mappings_file)
 
     return train_df, dev_df, class_names
 
