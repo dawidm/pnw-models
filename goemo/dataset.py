@@ -21,7 +21,7 @@ def _convert_labels(df, ekman, emo_names_file, ekman_mappings_file):
         ekman_class_to_int = {emo: i for i, emo in enumerate(class_names_ekman)}
 
         df['class'] = df['class'].apply(lambda emos: [ekman_mapping_dict[class_names_27[emo]] for emo in emos])
-        df['class'] = df['class'].apply(lambda emos: [ekman_class_to_int[emo] for emo in emos])
+        df['class'] = df['class'].apply(lambda emos: list(set([ekman_class_to_int[emo] for emo in emos])))
 
         return class_names_ekman
 
